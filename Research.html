@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research — Memory Chatbot</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+
+    .container { max-width: 860px; margin: 0 auto; }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid #2d3748;
+      padding-bottom: 2rem;
+      margin-bottom: 3rem;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; color: #f7fafc; }
+    header p  { color: #718096; margin-top: .5rem; font-size: .95rem; }
+    .badge {
+      display: inline-block;
+      background: #2d3748;
+      color: #a0aec0;
+      font-size: .75rem;
+      padding: .2rem .6rem;
+      border-radius: 9999px;
+      margin-top: .75rem;
+      margin-right: .4rem;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 3.5rem;
+    }
+    .section-label {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #667eea;
+      margin-bottom: .5rem;
+    }
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #f7fafc;
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid #2d3748;
+    }
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #cbd5e0;
+      margin: 1.5rem 0 .6rem;
+    }
+    p { color: #a0aec0; margin-bottom: .8rem; }
+    ul, ol { color: #a0aec0; padding-left: 1.4rem; margin-bottom: .8rem; }
+    li { margin-bottom: .4rem; }
+
+    /* Paper card */
+    .paper {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1.2rem;
+    }
+    .paper-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f7fafc;
+      margin-bottom: .2rem;
+    }
+    .paper-meta {
+      font-size: .78rem;
+      color: #667eea;
+      margin-bottom: .6rem;
+    }
+    .paper-body { color: #a0aec0; font-size: .9rem; }
+    .paper-takeaway {
+      margin-top: .8rem;
+      padding: .6rem .9rem;
+      background: #2d3748;
+      border-left: 3px solid #667eea;
+      border-radius: 4px;
+      font-size: .85rem;
+      color: #cbd5e0;
+    }
+    .paper-takeaway strong { color: #f7fafc; }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: .88rem;
+    }
+    th {
+      text-align: left;
+      padding: .55rem .8rem;
+      background: #2d3748;
+      color: #cbd5e0;
+      font-weight: 600;
+      border-bottom: 1px solid #4a5568;
+    }
+    td {
+      padding: .55rem .8rem;
+      border-bottom: 1px solid #2d3748;
+      color: #a0aec0;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1e2533; }
+
+    /* Code / quote */
+    code {
+      background: #2d3748;
+      color: #68d391;
+      padding: .15em .4em;
+      border-radius: 4px;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: .85em;
+    }
+    .callout {
+      background: #1a202c;
+      border: 1px solid #4a5568;
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin: 1.2rem 0;
+      color: #a0aec0;
+      font-size: .9rem;
+    }
+    .callout.warning { border-color: #d69e2e; }
+    .callout.info    { border-color: #667eea; }
+    .callout strong  { color: #f7fafc; }
+
+    /* Discrepancy */
+    .disc {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .disc-head {
+      display: flex;
+      align-items: baseline;
+      gap: .6rem;
+      margin-bottom: .5rem;
+    }
+    .disc-num {
+      background: #667eea22;
+      color: #667eea;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .1rem .5rem;
+      border-radius: 9999px;
+      letter-spacing: .06em;
+    }
+    .disc-title { font-weight: 600; color: #f7fafc; font-size: .95rem; }
+    .disc-verdict {
+      font-size: .75rem;
+      font-weight: 700;
+      padding: .15rem .5rem;
+      border-radius: 9999px;
+      margin-left: auto;
+    }
+    .verdict-code   { background: #276749; color: #9ae6b4; }
+    .verdict-both   { background: #2c5282; color: #90cdf4; }
+    .verdict-diagram{ background: #744210; color: #fbd38d; }
+
+    /* Tag */
+    .tag {
+      display: inline-block;
+      font-size: .72rem;
+      padding: .1rem .5rem;
+      border-radius: 9999px;
+      margin-right: .3rem;
+      margin-bottom: .2rem;
+    }
+    .tag-green  { background: #276749; color: #9ae6b4; }
+    .tag-blue   { background: #2c5282; color: #90cdf4; }
+    .tag-yellow { background: #744210; color: #fbd38d; }
+    .tag-purple { background: #44337a; color: #d6bcfa; }
+    .tag-gray   { background: #2d3748; color: #a0aec0; }
+
+    /* TOC */
+    .toc {
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 3rem;
+    }
+    .toc h3 { margin-top: 0; color: #a0aec0; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; }
+    .toc ol { margin-bottom: 0; }
+    .toc a  { color: #667eea; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    footer {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #2d3748;
+      color: #4a5568;
+      font-size: .82rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ── HEADER ─────────────────────────────────────────── -->
+  <header>
+    <h1>Research — Memory Chatbot</h1>
+    <p>Tổng hợp các nghiên cứu học thuật được tham khảo trước và trong quá trình phát triển dự án.</p>
+    <span class="badge">Long-term Memory</span>
+    <span class="badge">LLM Agents</span>
+    <span class="badge">Memory Consolidation</span>
+    <span class="badge">RAG</span>
+  </header>
+
+  <!-- ── TOC ───────────────────────────────────────────── -->
+  <div class="toc">
+    <h3>Mục lục</h3>
+    <ol>
+      <li><a href="#s1">Bối cảnh — vấn đề bộ nhớ của LLM</a></li>
+      <li><a href="#s2">Các bài báo nghiên cứu chính</a></li>
+      <li><a href="#s3">Quyết định kiến trúc dựa trên research</a></li>
+      <li><a href="#s4">So sánh diagram gốc vs. implementation</a></li>
+      <li><a href="#s5">Điểm yếu hiện tại và hướng cải thiện</a></li>
+    </ol>
+  </div>
+
+  <!-- ── SECTION 1 ───────────────────────────────────────── -->
+  <div class="section" id="s1">
+    <div class="section-label">Section 1</div>
+    <h2>Bối cảnh — vấn đề bộ nhớ của LLM</h2>
+
+    <p>LLM (Large Language Model) về bản chất là <strong style="color:#f7fafc">stateless</strong> — mỗi lần gọi API là một cuộc hội thoại hoàn toàn mới, không có ký ức về những gì đã nói trước đó. Đây là rào cản lớn nhất để xây dựng một trợ lý AI thực sự cá nhân hoá.</p>
+
+    <p>Ba giải pháp phổ biến trong industry:</p>
+    <ul>
+      <li><strong style="color:#f7fafc">Full context stuffing</strong> — nhét toàn bộ lịch sử vào context window. Đơn giản nhưng tốn token, bị giới hạn bởi context length, không scale.</li>
+      <li><strong style="color:#f7fafc">Vector database retrieval</strong> — embed tất cả messages, semantic search khi cần. Bắt được ngữ nghĩa tốt nhưng cần infra phức tạp (embedding model, vector DB).</li>
+      <li><strong style="color:#f7fafc">Structured memory extraction</strong> — LLM tự trích xuất fact từ hội thoại, lưu dưới dạng structured. Nhẹ hơn, interpretable, nhưng phụ thuộc vào chất lượng extraction.</li>
+    </ul>
+
+    <p>Dự án này theo hướng thứ 3, kết hợp với keyword-based retrieval — ưu tiên đơn giản, không cần vector DB, dễ debug và inspect.</p>
+  </div>
+
+  <!-- ── SECTION 2 ───────────────────────────────────────── -->
+  <div class="section" id="s2">
+    <div class="section-label">Section 2</div>
+    <h2>Các bài báo nghiên cứu chính</h2>
+
+    <!-- Paper 1 -->
+    <div class="paper">
+      <div class="paper-title">MemGPT: Towards LLMs as Operating Systems</div>
+      <div class="paper-meta">Packer et al. · UC Berkeley · 2023 · arXiv:2310.08560</div>
+      <div class="paper-body">
+        <p>MemGPT xem LLM context như <strong style="color:#f7fafc">RAM</strong> và external storage như <strong style="color:#f7fafc">disk</strong> — mô phỏng cách OS quản lý bộ nhớ ảo. Khi context window đầy, LLM tự quyết định evict thông tin nào ra "disk" (external storage) và load thông tin nào về "RAM" (context) tuỳ theo task hiện tại.</p>
+        <p>Hệ thống có 3 loại storage: <strong style="color:#f7fafc">In-context</strong> (main context = RAM), <strong style="color:#f7fafc">External</strong> (archival storage = HDD), <strong style="color:#f7fafc">Recall</strong> (conversation history = có thể search).</p>
+        <div class="paper-takeaway">
+          <strong>Ứng dụng vào dự án:</strong> Kiến trúc 3 tầng lưu trữ (MEMORY.md / topic files / .jsonl transcripts) lấy cảm hứng từ phân cấp này. MEMORY.md = in-context (luôn load), topic files = external (load on-demand), .jsonl = recall (search only).
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper 2 -->
+    <div class="paper">
+      <div class="paper-title">A Survey on the Memory Mechanism of Large Language Model based Agents</div>
+      <div class="paper-meta">Zhang et al. · 2024 · arXiv:2404.13501</div>
+      <div class="paper-body">
+        <p>Survey phân loại memory của LLM agent thành 4 loại dựa trên tâm lý học nhận thức:</p>
+        <ul>
+          <li><strong style="color:#f7fafc">Sensory memory</strong> — input tức thì (current token window)</li>
+          <li><strong style="color:#f7fafc">Short-term memory</strong> — in-context conversation history</li>
+          <li><strong style="color:#f7fafc">Long-term memory</strong> — external storage, persistent qua session</li>
+          <li><strong style="color:#f7fafc">Procedural memory</strong> — "cách làm" được mã hoá trong model weights</li>
+        </ul>
+        <p>Survey cũng chỉ ra rằng long-term memory hiệu quả nhất khi kết hợp <strong style="color:#f7fafc">episodic</strong> (lịch sử cụ thể) và <strong style="color:#f7fafc">semantic</strong> (fact tổng quát) — tương ứng với .jsonl transcripts và topic .md files trong dự án này.</p>
+        <div class="paper-takeaway">
+          <strong>Ứng dụng vào dự án:</strong> Topic files chứa semantic memory (fact tổng quát: "user dị ứng tôm"). Transcripts .jsonl chứa episodic memory (lịch sử cụ thể từng lượt chat).
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper 3 -->
+    <div class="paper">
+      <div class="paper-title">Sleep-Consolidated Memory (SCM) for LLM Agents</div>
+      <div class="paper-meta">Nghiên cứu lấy cảm hứng từ neuroscience — memory consolidation during sleep</div>
+      <div class="paper-body">
+        <p>Trong neuroscience, bộ não người consolidate memory trong lúc ngủ: hippocampus replay các sự kiện trong ngày, neocortex dần dần hấp thụ thông tin quan trọng vào long-term memory. Quá trình này giúp loại bỏ noise, giữ lại pattern quan trọng, và kết nối các memory rời rạc.</p>
+        <p>Áp dụng cho LLM: thay vì consolidate liên tục (tốn tài nguyên, có thể nhiễu), chạy một "giấc ngủ" định kỳ để xử lý batch các hội thoại gần đây.</p>
+        <div class="paper-takeaway">
+          <strong>Ứng dụng vào dự án:</strong> autoDream chính là cơ chế "sleep consolidation" — chạy batch định kỳ (≥24h + ≥5 session), đọc toàn bộ transcript gần đây (hippocampus replay), LLM hợp nhất và prune (neocortex consolidation).
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper 4 -->
+    <div class="paper">
+      <div class="paper-title">Generative Agents: Interactive Simulacra of Human Behavior</div>
+      <div class="paper-meta">Park et al. · Stanford · 2023 · arXiv:2304.03442</div>
+      <div class="paper-body">
+        <p>Nghiên cứu xây dựng 25 agent mô phỏng hành vi con người trong một "làng ảo". Mỗi agent có memory stream (chuỗi observation có timestamp), reflection mechanism (định kỳ tổng hợp pattern từ memory), và planning (lập kế hoạch dựa trên memory).</p>
+        <p><strong style="color:#f7fafc">Reflection</strong> là cơ chế quan trọng nhất: agent không chỉ nhớ fact thô mà còn <em>suy luận</em> từ các fact để tạo ra insight cao hơn ("Klaus is interested in software engineering" → "Klaus would be a good person to talk to about startups").</p>
+        <div class="paper-takeaway">
+          <strong>Ứng dụng vào dự án:</strong> autoDream Phase 3 (Consolidate) mô phỏng reflection — LLM không chỉ copy fact mới mà còn hợp nhất với context cũ để tạo ra hiểu biết sâu hơn. extractor (per-turn) = memory stream. autoDream = reflection.
+        </div>
+      </div>
+    </div>
+
+    <!-- Paper 5 -->
+    <div class="paper">
+      <div class="paper-title">Cognitive Architecture for Language Agents (CoALA)</div>
+      <div class="paper-meta">Sumers et al. · Princeton · 2023 · arXiv:2309.02427</div>
+      <div class="paper-body">
+        <p>CoALA đề xuất framework thống nhất cho LLM agent, phân tách rõ: <strong style="color:#f7fafc">Memory</strong> (working / episodic / semantic / procedural), <strong style="color:#f7fafc">Action space</strong> (retrieval / reasoning / grounding / learning), và <strong style="color:#f7fafc">Decision making</strong> (planning).</p>
+        <p>Đặc biệt, CoALA nhấn mạnh tầm quan trọng của <strong style="color:#f7fafc">learning</strong> — khả năng agent cập nhật memory dựa trên experience, không chỉ retrieve.</p>
+        <div class="paper-takeaway">
+          <strong>Ứng dụng vào dự án:</strong> Kiến trúc write paths (extractor / autoDream / manual_write) tương ứng với các learning mechanisms trong CoALA: incremental learning (extractor), batch learning (autoDream), và explicit instruction (manual_write).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3 ───────────────────────────────────────── -->
+  <div class="section" id="s3">
+    <div class="section-label">Section 3</div>
+    <h2>Quyết định kiến trúc dựa trên research</h2>
+
+    <h3>3.1 — Tại sao chọn ngưỡng ≥24h và ≥5 session cho autoDream?</h3>
+    <p>Ngưỡng này không phải tuỳ tiện — có 2 lý do từ research:</p>
+    <ul>
+      <li><strong style="color:#f7fafc">≥24h:</strong> Neuroscience cho thấy memory consolidation xảy ra trong chu kỳ ngủ (~24h). Chạy autoDream quá thường xuyên (vài giờ/lần) thì tốn tài nguyên và không có đủ "signal mới" để consolidate. Chạy quá hiếm (vài ngày) thì memory lỗi thời quá lâu.</li>
+      <li><strong style="color:#f7fafc">≥5 session:</strong> Một session quá ít fact để LLM có đủ context đưa ra quyết định consolidation tốt. Generative Agents dùng threshold tương tự cho reflection trigger. 5 session ≈ đủ để xuất hiện pattern lặp lại hoặc mâu thuẫn đáng xử lý.</li>
+    </ul>
+    <p>Cả 2 điều kiện phải đồng thời đúng (AND) — tránh autoDream chạy quá thường (nếu chỉ dùng session count) hoặc sau kỳ nghỉ dài không chat (nếu chỉ dùng giờ).</p>
+
+    <h3>3.2 — Tại sao có cả extractor (per-turn) lẫn autoDream (batch)?</h3>
+    <p>Hai cơ chế bổ sung cho nhau:</p>
+    <table>
+      <tr>
+        <th>Cơ chế</th>
+        <th>Tốc độ</th>
+        <th>Chất lượng</th>
+        <th>Khi nào dùng</th>
+      </tr>
+      <tr>
+        <td><code>extractor</code></td>
+        <td>Ngay sau mỗi turn (async)</td>
+        <td>Trung bình — chỉ thấy 1 turn, thiếu context</td>
+        <td>Fact quan trọng cần lưu ngay (tên, dị ứng, v.v.)</td>
+      </tr>
+      <tr>
+        <td><code>autoDream</code></td>
+        <td>Batch định kỳ (≥24h + ≥5 session)</td>
+        <td>Cao — thấy toàn bộ pattern, loại bỏ mâu thuẫn</td>
+        <td>Pattern dần hiện ra qua nhiều session (sở thích, thói quen)</td>
+      </tr>
+    </table>
+    <p>Survey (Zhang et al., 2024) gọi đây là <em>immediate encoding</em> vs. <em>consolidated encoding</em> — cả 2 cần thiết trong hệ thống memory production.</p>
+
+    <h3>3.3 — Tại sao dùng file-based lock thay vì queue hoặc mutex?</h3>
+    <p>File-based lock (<code>.consolidation.lock</code>) được chọn vì:</p>
+    <ul>
+      <li>Không cần dependency ngoài (queue library, Redis, v.v.)</li>
+      <li>Visible — có thể inspect thủ công khi debug</li>
+      <li>Persistent qua process restart (khác với in-memory mutex)</li>
+      <li>Có stale detection: nếu process giữ lock bị crash, lock tự được giải phóng sau <code>LOCK_STALE_MINUTES</code></li>
+    </ul>
+    <div class="callout warning">
+      <strong>Hạn chế đã biết:</strong> File-based lock dùng polling mỗi 0.2s — không đảm bảo thứ tự (không FIFO). Nếu extractor và autoDream cùng chờ lock, không có gì đảm bảo ai vào trước. Đây là trade-off chấp nhận được vì cả 2 đều chỉ cần "không ghi đồng thời", không cần thứ tự nghiêm ngặt.
+    </div>
+
+    <h3>3.4 — Tại sao manual write (/remember) không tự giải conflict?</h3>
+    <p>Thiết kế có chủ ý: khi user nói "tôi hết dị ứng tôm", <code>manual_write</code> append nội dung mới vào topic cũ thay vì xóa. Lý do:</p>
+    <ul>
+      <li>Tránh mất dữ liệu do LLM phân loại sai (false positive)</li>
+      <li>Giữ lại lịch sử — autoDream Phase 3 sẽ có đủ context để quyết định loại bỏ fact nào</li>
+      <li>Consistent với nguyên tắc "write is cheap, prune is expensive" trong memory systems</li>
+    </ul>
+
+    <h3>3.5 — Tại sao dùng keyword overlap thay vì vector embeddings?</h3>
+    <p>Đây là quyết định đánh đổi có chủ ý:</p>
+    <table>
+      <tr>
+        <th></th>
+        <th>Keyword overlap (hiện tại)</th>
+        <th>Vector embeddings (production)</th>
+      </tr>
+      <tr>
+        <td>Dependency</td>
+        <td>Không cần gì thêm</td>
+        <td>Embedding model (OpenAI / local)</td>
+      </tr>
+      <tr>
+        <td>Synonym</td>
+        <td>"bò" ≠ "beef" → MISS</td>
+        <td>"bò" ≈ "beef" → HIT</td>
+      </tr>
+      <tr>
+        <td>Debug</td>
+        <td>Dễ — inspect trực tiếp từng từ</td>
+        <td>Khó — cosine similarity là black box</td>
+      </tr>
+      <tr>
+        <td>Latency</td>
+        <td>~0ms (pure Python)</td>
+        <td>~50–200ms (API call hoặc local inference)</td>
+      </tr>
+      <tr>
+        <td>Phù hợp khi</td>
+        <td>Prototype, debug, nhỏ</td>
+        <td>Production, user base lớn, đa ngôn ngữ</td>
+      </tr>
+    </table>
+    <p>Research (Dense Passage Retrieval, Karpukhin et al. 2020) chứng minh semantic search vượt trội BM25/keyword-based cho open-domain QA. Tuy nhiên với personal memory chatbot quy mô nhỏ, keyword overlap đủ dùng và dễ maintain hơn nhiều.</p>
+  </div>
+
+  <!-- ── SECTION 4 ───────────────────────────────────────── -->
+  <div class="section" id="s4">
+    <div class="section-label">Section 4</div>
+    <h2>So sánh diagram gốc vs. implementation</h2>
+
+    <p>Trong quá trình phát triển, phát hiện 6 điểm khác biệt giữa diagram thiết kế ban đầu và code thực tế. Research được dùng để xác định implementation nào đúng hơn về mặt lý thuyết.</p>
+
+    <!-- Disc 1 -->
+    <div class="disc">
+      <div class="disc-head">
+        <span class="disc-num">01</span>
+        <span class="disc-title">extractor có ghi vào .jsonl không?</span>
+        <span class="disc-verdict verdict-code">Code đúng</span>
+      </div>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Diagram gốc:</strong> Không có mũi tên từ extractMemories → .jsonl.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Code thực tế:</strong> <code>extractor.py</code> không ghi vào .jsonl — chỉ ghi vào topic files và MEMORY.md.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Kết luận:</strong> Diagram và code đều nhất quán — extractor không ghi .jsonl. Transcript được ghi bởi <code>main.py</code> (transcript logger), hoàn toàn độc lập với extractor.</p>
+    </div>
+
+    <!-- Disc 2 -->
+    <div class="disc">
+      <div class="disc-head">
+        <span class="disc-num">02</span>
+        <span class="disc-title">autoDream đọc hay ghi topic files?</span>
+        <span class="disc-verdict verdict-code">Code đúng</span>
+      </div>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Diagram gốc:</strong> Chỉ vẽ mũi tên autoDream → topic files (ghi).</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Code thực tế:</strong> autoDream vừa đọc (Phase 1: Orient) vừa ghi (Phase 3: Consolidate, Phase 4: Prune).</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Research backing:</strong> Generative Agents (Park et al.) — reflection phải đọc memory trước khi có thể tổng hợp. Đọc mà không có → không thể biết context cũ → dễ tạo duplicate.</p>
+    </div>
+
+    <!-- Disc 3 -->
+    <div class="disc">
+      <div class="disc-head">
+        <span class="disc-num">03</span>
+        <span class="disc-title">extractMemories và extractor.py là 1 hay 2 thứ?</span>
+        <span class="disc-verdict verdict-both">Cùng nhau</span>
+      </div>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Diagram gốc:</strong> Dùng tên "extractMemories".</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Code thực tế:</strong> <code>extractor.py</code> với function <code>maybe_extract_async()</code> → spawn thread → <code>_run()</code>.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Kết luận:</strong> Cùng 1 thứ — diagram dùng tên khái niệm, code dùng tên file. extractMemories = <code>extractor._run()</code>.</p>
+    </div>
+
+    <!-- Disc 4 -->
+    <div class="disc">
+      <div class="disc-head">
+        <span class="disc-num">04</span>
+        <span class="disc-title">Background consolidation dùng "subagent" hay threading?</span>
+        <span class="disc-verdict verdict-code">Code đúng</span>
+      </div>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Diagram gốc:</strong> Gọi autoDream là "background process" — mơ hồ, có thể hiểu là subprocess hoặc agent riêng.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Code thực tế:</strong> <code>threading.Thread</code> — chạy trong cùng process, không phải subprocess hay Claude subagent.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Research backing:</strong> MemGPT dùng async executor trong cùng process. Dùng subprocess cho task CPU-light như file I/O + LLM API call là overkill và phức tạp hơn không cần thiết.</p>
+    </div>
+
+    <!-- Disc 5 -->
+    <div class="disc">
+      <div class="disc-head">
+        <span class="disc-num">05</span>
+        <span class="disc-title">Race condition khi ghi đồng thời vào cùng file</span>
+        <span class="disc-verdict verdict-code">Code đúng</span>
+      </div>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Vấn đề:</strong> extractor và autoDream đều ghi topic files. Nếu cả 2 đọc file vào RAM cùng lúc trước khi ai kịp ghi → một bên sẽ ghi đè mất dữ liệu của bên kia.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Code thực tế:</strong> <code>.consolidation.lock</code> — file-based lock với stale detection. Cả extractor lẫn autoDream đều phải acquire lock trước khi read-merge-write.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Diagram gốc:</strong> Không đề cập race condition — đây là improvement so với diagram.</p>
+    </div>
+
+    <!-- Disc 6 -->
+    <div class="disc">
+      <div class="disc-head">
+        <span class="disc-num">06</span>
+        <span class="disc-title">Retrieval dùng mechanism gì?</span>
+        <span class="disc-verdict verdict-code">Code đúng (với hạn chế đã biết)</span>
+      </div>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Diagram gốc:</strong> Không mô tả rõ retrieval mechanism.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Code thực tế:</strong> Keyword overlap — so token giữa query và (hook + title) của từng topic, lấy những topic có overlap ≥ 1 từ (không tính stopwords), sort by overlap descending.</p>
+      <p style="color:#a0aec0;font-size:.9rem"><strong style="color:#f7fafc">Research backing:</strong> BM25 / TF-IDF là baseline mạnh cho keyword retrieval. Với personal memory có số topic nhỏ (<100), keyword overlap đủ hiệu quả. Điểm yếu: synonym miss ("bò" ≠ "beef") — fix bằng vector embeddings khi scale.</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 5 ───────────────────────────────────────── -->
+  <div class="section" id="s5">
+    <div class="section-label">Section 5</div>
+    <h2>Điểm yếu hiện tại và hướng cải thiện</h2>
+
+    <table>
+      <tr>
+        <th>Vấn đề</th>
+        <th>Tác động</th>
+        <th>Hướng fix</th>
+        <th>Độ phức tạp</th>
+      </tr>
+      <tr>
+        <td>Synonym miss trong retrieval</td>
+        <td>User hỏi "beef" → bỏ sót topic "bò"</td>
+        <td>Vector embeddings (text-embedding-3-small hoặc local model)</td>
+        <td><span class="tag tag-yellow">Trung bình</span></td>
+      </tr>
+      <tr>
+        <td>extractor không thấy toàn bộ hội thoại</td>
+        <td>Fact trải dài nhiều turn bị bỏ sót</td>
+        <td>Truyền N turn gần nhất (sliding window) thay vì chỉ 1 turn</td>
+        <td><span class="tag tag-green">Thấp</span></td>
+      </tr>
+      <tr>
+        <td>manual_write không tự resolve conflict</td>
+        <td>Fact cũ và mới cùng tồn tại cho đến khi autoDream chạy</td>
+        <td>Prompt LLM explicit: "fact này có mâu thuẫn fact cũ không?"</td>
+        <td><span class="tag tag-green">Thấp</span></td>
+      </tr>
+      <tr>
+        <td>autoDream không test end-to-end</td>
+        <td>Không biết Phase 3 consolidate đúng không</td>
+        <td>Viết eval script với mock LLM cho toàn bộ 4 phase</td>
+        <td><span class="tag tag-yellow">Trung bình</span></td>
+      </tr>
+      <tr>
+        <td>Không có memory type: procedural</td>
+        <td>Bot không nhớ "cách user muốn được trả lời" (format, tone)</td>
+        <td>Thêm topic type "preference" — lưu cách user thích tương tác</td>
+        <td><span class="tag tag-yellow">Trung bình</span></td>
+      </tr>
+      <tr>
+        <td>Retrieval không dùng timestamp</td>
+        <td>Fact cũ và mới được đối xử như nhau</td>
+        <td>Boost score cho fact gần đây, decay cho fact cũ (như Generative Agents recency score)</td>
+        <td><span class="tag tag-purple">Cao</span></td>
+      </tr>
+    </table>
+
+    <div class="callout info">
+      <strong>Ưu tiên nếu muốn productionize:</strong> Fix synonym miss (vector embeddings) là impactful nhất vì ảnh hưởng trực tiếp đến trải nghiệm user — memory được lưu nhưng không được dùng đến thì coi như không có.
+    </div>
+  </div>
+
+  <footer>
+    Memory Chatbot · Research document · 2026
+  </footer>
+
+</div>
+</body>
+</html>
